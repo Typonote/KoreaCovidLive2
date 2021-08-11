@@ -4,7 +4,7 @@ const initState = {
 
 const Reducer = (state = initState, action) => {
     switch(action.type) {
-        case "CHANGE_TYPE":
+        case "CHANGE_THEME":
             return {
                 theme: action.theme
             }

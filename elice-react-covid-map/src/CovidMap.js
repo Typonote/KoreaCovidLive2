@@ -20,6 +20,9 @@ import {
 } from "./area/all_area";
 import axios from "axios";
 import styled from "styled-components";
+import { useDispatch, useSelector } from "react-redux";
+import {changeTheme} from "./redux/action";
+
 
 // 코로나 단계별 색상
 const fillColor = ["#4088da", "#ffb911", "#fc7001", "#e60000"];
@@ -107,8 +110,10 @@ const StyleBox = styled.div`
 `;
 
 function CovidInfo({ area,date, todayNum, level }) {
+  const theme = useSelector((state) => state.theme);
+
   return (
-    <StyleBox>
+    <StyleBox style={{background: theme === "light" ? "white" : "darkgrey"}}>
       {area !== "" && (
         <>
           <h2>{area} 코로나 정보 ({date} 기준)</h2>
@@ -128,8 +133,10 @@ const StyleMap = styled.div`
 `;
 
 function CovidMap() {
+  const dispatch = useDispatch();
+  const theme = useSelector((state) => state.theme);
+
   const [covidData, setCovidData] = useState(null);
-  const [updatedDate,setUpdatedDate] = useState('');
   const [selectArea, setSelectArea] = useState({
     area: "",
     level: 0,
@@ -139,12 +146,9 @@ function CovidMap() {
     console.log(covidData);
   }, [covidData]);
 
-  const fetchData = () => {
-    axios.post("http://localhost:5000/covidData").then((response) => {
-      if (response.data) {
-        setCovidData(response.data);
-      }
-    });
+  const fetchData = async () => {
+    let response = await axios.post("http://localhost:5000/covidData")
+    setCovidData(response.data);
   }
 
   useEffect(() => {
@@ -160,7 +164,7 @@ function CovidMap() {
     return () => {
       clearInterval(timer);
     }
-  })
+  }, []);
   
 
   const handlerAreaSelect = (area) => {
@@ -171,13 +175,18 @@ function CovidMap() {
     });
   };
 
+  const handleTheme = () => {
+    dispatch(changeTheme(theme === "light" ? "dark" : "light"));
+  }
+
   return (
-    <div>
+    <StyleMap style={{background: theme === "light" ? "white" : "grey"}}>
+      <button onClick={handleTheme}>{theme === "light" ? "다크모드" : "라이트모드"}</button>
       <h1>대한민국 코로나 현황</h1>
       {covidData === null ? (
         <p>Loading...</p>
       ) : (
-        <StyleMap>
+        <>
           <CovidInfo
             area={selectArea.area}
             date={covidData.updated_data}
@@ -185,9 +194,9 @@ function CovidMap() {
             level={selectArea.level}
           />
           <CovidView covidData={covidData.data} onAreaClick={handlerAreaSelect} />
-          </StyleMap>
+        </>
       )}
-    </div>
+    </StyleMap>
   );
 }
 export default CovidMap;

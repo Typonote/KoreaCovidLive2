@@ -4,6 +4,7 @@ import './App.css';
 import CovidMap from './CovidMap';
 import {Provider} from "react-redux";
 import store from "./redux/store";
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
   return (
