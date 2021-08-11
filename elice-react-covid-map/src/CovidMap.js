@@ -23,6 +23,8 @@ import styled from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
 import {changeTheme} from "./redux/action";
 
+import {Button} from "react-bootstrap";
+
 
 // 코로나 단계별 색상
 const fillColor = ["#4088da", "#ffb911", "#fc7001", "#e60000"];
@@ -141,9 +143,22 @@ function CovidMap() {
     area: "",
     level: 0,
   });
+  const [allNum,setAllNum] = useState(0); 
 
   useEffect(() => {
-    console.log(covidData);
+    if(covidData) {
+    console.log("covidData", covidData.data);
+
+    const data = covidData.data;
+
+    const numArr = Object.keys(data).map(key => {
+      return data[key].num
+    })
+
+    const allNums = numArr.reduce((a,b) => a + b);
+
+    setAllNum(allNums);
+  }
   }, [covidData]);
 
   const fetchData = async () => {
@@ -153,19 +168,7 @@ function CovidMap() {
 
   useEffect(() => {
     fetchData();
-  }, []);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      fetchData();
-      console.log("갱신 완료.");
-    }, 5000);
-
-    return () => {
-      clearInterval(timer);
-    }
-  }, []);
-  
+  }, []);  
 
   const handlerAreaSelect = (area) => {
     setSelectArea({
@@ -175,18 +178,14 @@ function CovidMap() {
     });
   };
 
-  const handleTheme = () => {
-    dispatch(changeTheme(theme === "light" ? "dark" : "light"));
-  }
-
   return (
     <StyleMap style={{background: theme === "light" ? "white" : "grey"}}>
-      <button onClick={handleTheme}>{theme === "light" ? "다크모드" : "라이트모드"}</button>
       <h1>대한민국 코로나 현황</h1>
       {covidData === null ? (
         <p>Loading...</p>
       ) : (
         <>
+        <p>총 확진자 수 : {allNum}</p>
           <CovidInfo
             area={selectArea.area}
             date={covidData.updated_data}
