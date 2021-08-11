@@ -127,11 +127,6 @@ const StyleMap = styled.div`
   align-items: center;
 `;
 
-
-
-
-
-
 function CovidMap() {
   const [covidData, setCovidData] = useState(null);
   const [updatedDate,setUpdatedDate] = useState('');
